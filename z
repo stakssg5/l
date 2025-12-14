@@ -1,0 +1,27 @@
+import requests  
+import random  
+
+# Valid Solana base58 characters (excluding ambiguous ones)  
+valid_chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz'  
+
+def generate_address():  
+    # Generate a 44-character valid Solana address  
+    return ''.join(random.choices(valid_chars, k=44))  
+
+def check_balance(address):  
+    url = f"https://explorer.solana.com/api/v2/address/{address}?cluster=mainnet-beta"  
+    try:  
+        response = requests.get(url)  
+        response.raise_for_status()  # Check for HTTP errors  
+        data = response.json()  
+        return data.get('result', {}).get('balance', 0)  
+    except Exception as e:  
+        print(f"❌ Invalid address: {address} | Error: {e}")  
+        return 0  
+
+while True:  
+    address = generate_address()  
+    balance = check_balance(address)  
+    if balance > 0:  
+        print(f"🎉 Found a wallet with {balance} SOL at address: {address}")  
+        break  
